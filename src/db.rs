@@ -51,7 +51,48 @@ impl Database{
                 completed: row.get(2)?,
             })
         })?
-        .collect::Result<Vec<_>, _>>()?;
+        .collect::<Result<Vec<_>, _>>()?;
         Ok(tasks)
+    }
+
+    pub fn toggle_task(&self, id: i32) -> rusqlite::Result<()> {
+        let rows = self.conn.execute(
+            "UPDATE tasks SET completed = NOT completed WHERE id = ?1",
+            params![id],
+        )?;
+
+        if rows == 0 {
+            return Err(rusqlite::Error::QueryReturnedNoRows);
+        }
+
+        Ok(())
+    }
+
+    pub fn delete_task(&self, id: i32) -> rusqlite::Result<()> {
+        let task_exist = self.conn.execute(
+            "SELECT * FROM tasks WHERE id = ?1",
+            params![id],
+        )?;
+
+        if rows == 0{
+            return Err(rusqlite::Error::QueryReturnedNoRows);
+        }
+
+        let tx = conn.transaction()?;
+
+        let task_delete = tx.execute(
+            "DELETE FROM tasks WHERE id = ?1", 
+            params![id],
+        )?;
+
+        if task_delete == 0 {
+            return Err(rusqlite::Error::QueryReturnedNoRows)
+        }
+        if task_delete > 1 {
+            return Err(rusqlite::Error::QueryReturnedMoreThanOneRow)
+        }
+        tx.commit()?;
+
+        Ok(())
     }
 }
