@@ -1,5 +1,10 @@
 use rusqlite::{params, Connection, Result};
 
+pub struct Task{
+    pub id: i32,
+    pub title: String,
+    pub completed: bool,
+}
 pub struct Database{
     conn: Connection
 }
@@ -32,5 +37,21 @@ impl Database{
         )?;
 
         Ok(self.conn.last_insert_rowid() as i32)    
+    }
+
+    pub fn get_task(&self) -> rusqlite::Result<Vec<Task>> {
+        let mut stmt = self.conn.prepare(
+            "SELECT id, title, completed FROM tasks ORDER by id"
+        )?;
+
+        let tasks = stmt.query_map([], |row| {
+            Ok(Task {
+                id: row.get(0)?,
+                title: row.get(1)?,
+                completed: row.get(2)?,
+            })
+        })?
+        .collect::Result<Vec<_>, _>>()?;
+        Ok(tasks)
     }
 }
