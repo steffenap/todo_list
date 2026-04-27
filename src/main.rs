@@ -1,3 +1,5 @@
+pub mod db;
+
 use axum::{
     routing::get,
     Router,
@@ -8,7 +10,7 @@ use serde::{Deserialize, Serialize};
 let app = Router::new()
     .route("/", get(home))
     .route("login", get(login))
-    .route()
+    .route();
 
 async fn home(){
 
