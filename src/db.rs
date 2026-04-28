@@ -93,6 +93,31 @@ impl Database{
         }
         tx.commit()?;
 
+        Ok((task_delete))
+    }
+
+    pub fn update_task(&self, id: i32, title: &str) -> rusqlite::Result<()> {
+        if title.trim().is_empty() {
+            return Err(rusqlite::Error::InvalidParameterName(
+                "Title cannot be empty".to_string()
+            ));
+        }
+
+        let task_exist = self.conn.execute(
+            "SELECT * FROM tasks WHERE id = ?1",
+            params![id],
+        )?;
+
+        if task_exist != 1 {
+            return Err(rusqlite::Error::InvalidQuery)
+        }
+        let task_update = self.conn.execute("UPDATE task SET title = ?2 WHERE id = ?1",
+            params![id, title]
+            )?;
+        
         Ok(())
     }
+
+    
+    
 }
