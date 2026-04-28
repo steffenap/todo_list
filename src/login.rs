@@ -7,6 +7,14 @@ pub async fn login(credentials: web::Json<Login>, db: db) -> HttpResponse {
     let pass = credentials.password.clone();
     //TODO: FILTER USERS BY CREDENTIALS.USERNAME, AND TRY TO VERIFY PASS WITH USERNAME
 
+    let users = db.conn.execute()?;
+
+    if users.len() == 0 {
+        return HttpResponse::NotFound().await.unwrap()
+    } else if users.len() > 1 {
+        return HttpResponse::Conflict().await.unwrap()
+    }
+
     return match users[0].verify(pass) {
         true => {
             let token = JwToken::new(users[0].id);

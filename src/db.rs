@@ -1,10 +1,46 @@
 use rusqlite::{params, Connection, Result};
+use uuid::Uuid;
+use serde::{Deserialize, Serialize};
 
+#[derive(Debug)]
 pub struct Task{
     pub id: i32,
     pub title: String,
     pub completed: bool,
+    pub creator: Option<i32>,
 }
+
+    impl Task {
+        pub fn new(title: String, creator: Option<i32>) {
+            
+        }
+    }
+
+#[derive(Serialize, Deserialize, Debug, Clone, Uuid)]
+pub struct User{
+    pub id: Option<i32>,
+    pub username: String,
+    pub email: String,
+    pub password: String,
+    pub unique_id: String,
+}
+
+    impl User {
+        pub fn new(username: String, email: String, password: String) -> User {
+            let hashed: String = hash(password.as_str(), bcrypt::DEFAULT_COST).unwrap();
+            let uuid = Uuid::new_v4().to_string();
+            return User {
+                id,
+                username,
+                email,
+                password: hashed,
+                unique_id: uuid
+            }
+        }
+        pub fn verify(&self, password: &Str) -> bool {
+            bcrypt::verify(password.as_str(), &self.password).unwrap()
+        }
+    }
 pub struct Database{
     conn: Connection
 }
@@ -118,6 +154,6 @@ impl Database{
         Ok(())
     }
 
-    
+
     
 }
