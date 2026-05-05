@@ -1,6 +1,7 @@
 pub mod db;
 pub mod users;
 pub mod login;
+pub mod database;
 
 use axum::{
     routing::get,
